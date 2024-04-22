@@ -10,11 +10,17 @@ class Lexico:
 
     #Leer el siguiente caracter.
     def siguiente(self):
-        pass
+        self.posActual += 1
+        if self.posActual >= len(self.fuente):
+            self.carActual = '\0' #End of file EOF
+        else:
+            self.carActual = self.fuente[self.posActual]
 
     #Regresar el caracter adelante (lookahead).
     def asomar(self): #NO guarda los cambios
-        pass
+        if self.posActual + 1 >= len(self.fuente):
+            return '\0'
+        return self.fuente[self.posActual + 1] #Regresa el car adelante
     
     #Token inválido, imprimir error y salir.
     def abortar(self, mensaje):
@@ -22,18 +28,23 @@ class Lexico:
 
     #Saltar espacios, \t y \r, pero no \n, estas se utilizarán para indicar el final de una sentencia.
     def saltarEspacios(self):
-        pass
+        #Saltar los car si son espacios
+        if self.carActual == ' ' or self.carActual == '\t' or self.carActual == '\r':
+            self.siguiente()
 
-    #Saltar comentarios en el código.	
+    #Saltar comentarios en el código. Solo existen comentarios de línea.	
     def saltarComentarios(self):
-        pass
+        #Saltar car si es '#' comentarios de linea (\n)
+        if self.carActual == '#':
+            while self.carActual != '\n': #Siempre y cuando no sea \n
+                self.siguiente()
     
     #Regresar el siguiente token.
     def getToken(self):
         self.saltarEspacios()
         self.saltarComentarios()
         token = None #Var auxiliar
-
+        
         if self.carActual == '+':
             pass
         
@@ -64,7 +75,7 @@ class Lexico:
         elif self.carActual == '!':
             pass
         
-        elif self.carActual.isdigit(): #Numeros
+        elif self.carActual.isdigit(): #Números
             pass
         
         elif self.carActual == '\"': #Strings
@@ -78,7 +89,7 @@ class Lexico:
         else:
             self.abortar("El lexema '" + self.carActual + "' es desconocido :(")
         
-        #Si ya se identificó el token, debemos leer el siguiente car[acter]
+        #Si ya se identificó el token, debemos leer el siguiente carácter
         self.siguiente() 
         return token
 
@@ -97,10 +108,15 @@ class Token:
 
 
 class TipoToken(enum.Enum):
+    #Delimitadores
     EOF = -1 #End of file \0
     NEWLINE = 0 #\n
-    NUMERO = 1
-    ID = 2
+    
+    #Identificador
+    ID = 1
+
+    #Literales
+    NUMERO = 2
     STRING = 3
     
     #Keywords 100>, pero <200
